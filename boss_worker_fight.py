@@ -6,6 +6,7 @@ pink = 6
 servo = 10
 boss = 14
 btn_boss_correct = 15
+ws_pin = 22
 
 high = 1
 low = 0
@@ -19,6 +20,10 @@ servo_pwm = PWM(Pin(servo))
 servo_pwm.freq(50)
 # UART初期設定（UART番号,クロックレート,TXピン：GP4　RXピン：GP5）
 uart = machine.UART(1,baudrate=9600,tx = machine.Pin(4),rx = machine.Pin(5))
+# LED初期設定
+led_num = 20
+BRIGHTNESS = 0.2  # Adjust the brightness (0.0 - 1.0)
+neoRing = neopixel.NeoPixel(Pin(ws_pin), led_num)
 
 
 def set_angle(angle):
@@ -55,6 +60,27 @@ def play_sound(num):
     # "mp3"という名称のフォルダ内に保存された、"0001.mp3"のような名称のファイルを再生
     print("Play {}".format(num))
     send_data(0x12, num)
+
+def set_brightness(color):
+    r, g, b = color
+    r = int(r * BRIGHTNESS)
+    g = int(g * BRIGHTNESS)
+    b = int(b * BRIGHTNESS)
+    return (r, g, b)
+
+def rgb(red,green,blue):
+    color = (red, green, blue)
+    color = set_brightness(color)
+    neoRing.fill(color)
+    neoRing.write()
+    time.sleep(0.095)
+
+def loop():
+    rgb(255,0,0)
+    rgb(0,255,0)
+    rgb(255,255,0)
+    rgb(0,0,255)
+    rgb(255,0,255)
     
 def boss_correct(pin):
     init_sd()
@@ -62,7 +88,8 @@ def boss_correct(pin):
     set_volume(15)
     num = 1
     play_sound(num)
-    time.sleep(0.5)
+    for i in range(500):
+        loop()
 
 btn_boss_correct_pin.irq(trigger=machine.Pin.IRQ_FALLING, handler=boss_correct)
 
