@@ -81,11 +81,13 @@ while True:
     
     if red_pin.value() == high:
         print("worker push")
-        set_angle(60)
         
         # Polling for boss push within 7 seconds
         start_time = time.ticks_ms()
-        while time.ticks_diff(time.ticks_ms(), start_time) < 7000:
+        angle = 90
+        while (t := time.ticks_diff(time.ticks_ms(), start_time)) < 7000:
+            if t % 700 == 0:
+                set_angle(angle - 3)
             if boss_pin.value() == high:
                 print("boss push as interrupting worker")
                 set_angle(90)
