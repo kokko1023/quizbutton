@@ -86,7 +86,7 @@ def loop():
 def boss_correct(pin):
     init_sd()
     print("mp3")
-    set_volume(15)
+    set_volume(50)
     num = 1
     play_sound(num)
     for i in range(15):
