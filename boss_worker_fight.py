@@ -1,12 +1,13 @@
 from machine import Pin, PWM, UART
 import time, utime
+import neopixel
 
 red = 2
 pink = 6
 servo = 10
 boss = 14
 btn_boss_correct = 15
-ws_pin = 22
+ws_pin = 16
 
 high = 1
 low = 0
@@ -88,8 +89,9 @@ def boss_correct(pin):
     set_volume(15)
     num = 1
     play_sound(num)
-    for i in range(500):
+    for i in range(15):
         loop()
+    rgb(0,0,0)
 
 btn_boss_correct_pin.irq(trigger=machine.Pin.IRQ_FALLING, handler=boss_correct)
 
@@ -100,6 +102,7 @@ num = 1
 play_sound(num)
 
 set_angle(90)
+rgb(0,0,0)
 
 # polling
 while True:
@@ -108,11 +111,19 @@ while True:
     
     if red_pin.value() == high:
         print("worker push")
-        set_angle(60)
         
         # Polling for boss push within 7 seconds
         start_time = time.ticks_ms()
-        while time.ticks_diff(time.ticks_ms(), start_time) < 7000:
+        angle = 90
+        while (t := time.ticks_diff(time.ticks_ms(), start_time)) < 5000:
+            if angle < 60:
+                pass
+            elif t % 300 == 0:
+                angle = angle - 3
+                set_angle(angle)
+                print(angle)
+            else:
+                pass
             if boss_pin.value() == high:
                 print("boss push as interrupting worker")
                 set_angle(90)
